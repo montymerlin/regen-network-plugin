@@ -81,7 +81,7 @@ zip -r /tmp/regen-network-0.3.0.plugin . \
 The output `/tmp/regen-network-0.3.0.plugin` is your upload artifact.
 
 **Option 3 — built by a packager skill** (e.g. the workspace `cowork-plugin-packager`):
-The packaged file lives at `<workspace>/ops/plugins/_dist/regen-network-0.3.0.plugin` after the skill runs.
+The skill writes the packaged file to a temporary folder and prints its path.
 
 Then upload:
 
