@@ -6,9 +6,10 @@ Canonical repo instructions for `regen-network-plugin`.
 
 - **Name:** regen-network
 - **Type:** Host-agnostic MCP + skills package with Claude plugin packaging compatibility
-- **Version:** 0.2.0
+- **Version:** 0.3.0
 - **Stack:** Markdown skills + `.mcp.json` server definitions + setup docs
-- **Repository:** https://github.com/regen-network/regen-ai-claude
+- **Repository:** https://github.com/montymerlin/regen-network-plugin
+- **Maintainer:** Monty Bryant. The MCP servers are upstream work by Gaia AI and Regen Network (credited in README); this repo owns only the skills, docs and packaging.
 
 ## Canonical Structure
 
@@ -17,7 +18,7 @@ regen-network-plugin/
 ├── .claude-plugin/
 │   ├── plugin.json          # Claude plugin packaging metadata
 │   └── marketplace.json     # Claude marketplace listing
-├── .mcp.json                # MCP server definitions
+├── .mcp.json                # MCP server definitions (pinned versions)
 ├── skills/
 │   ├── regen-search/
 │   ├── regen-digest/
@@ -34,6 +35,7 @@ regen-network-plugin/
 ├── CHANGELOG.md
 ├── DECISIONS.md
 ├── ROADMAP.md
+├── LICENSE                  # Apache-2.0
 ├── README.md
 └── SETUP.md
 ```
@@ -58,7 +60,9 @@ Cowork install is via a `.plugin` zip uploaded through Claude Desktop. Two paths
 ## Runtime Conventions
 
 - Probe MCP availability before invoking skills that depend on specific servers.
-- Do not assume all four MCP servers are connected in every host.
+- Three MCP servers are declared: `regen-koi`, `regen-ledger`, `regen-compute`. Do not assume all three are connected in every host. `registry-review` is deliberately not bundled (private install source; Decision 005).
+- In skills, reference tools by their plugin-namespaced names, `mcp__plugin_regen-network_<server>__<tool>`, which is what Claude Code exposes for plugin servers. Each skill carries a one-line note for hosts that add the servers directly.
+- Server versions are pinned in `.mcp.json` and mirrored in `SETUP.md`. Bump them deliberately, following "Updating a pin" in `skills/regen-update/SKILL.md`; never switch back to `@latest` or an unpinned `uvx`.
 - Use a portable intra-repo root variable if future skill references need filesystem lookups:
   `REGEN_NETWORK_ROOT="${REGEN_NETWORK_ROOT:-${CLAUDE_PLUGIN_ROOT:-$PWD}}"`
 
@@ -77,7 +81,7 @@ Cowork install is via a `.plugin` zip uploaded through Claude Desktop. Two paths
 1. **Host-agnostic package, host-specific guidance** — the package should run anywhere MCP works, while docs can still recommend the best host UX.
 2. **Skills route through MCPs** — do not improvise capabilities outside the declared MCP surface without checking availability.
 3. **Progressive disclosure** — keep the repo-level instructions concise and push setup detail into `SETUP.md`.
-4. **Safety around transactions** — never execute on-chain actions without explicit confirmation.
+4. **Safety around transactions** — never execute on-chain actions without explicit confirmation. Skills default to the link-based retirement path and never suggest setting `REGEN_WALLET_MNEMONIC` or `ECOBRIDGE_EVM_MNEMONIC`; with either set, `regen-compute` signs irreversible transactions itself.
 5. **Ecosystem clarity** — docs should distinguish knowledge commons, ledger, compute, and registry-review roles cleanly.
 
 ## Boundaries
@@ -92,4 +96,4 @@ Cowork install is via a `.plugin` zip uploaded through Claude Desktop. Two paths
 - Reintroduce `CLAUDE.md` as the canonical repo instruction file
 - Hardcode Claude-specific runtime paths as if they define the package
 - Assume one host is mandatory when the MCP layer is portable
-- Expose mnemonics, API keys, or other sensitive credentials
+- Expose mnemonics, API keys, or other sensitive credentials, or ask a user for a seed phrase

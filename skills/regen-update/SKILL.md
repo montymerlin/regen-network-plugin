@@ -7,96 +7,99 @@ description: >
   or wants to know if any upstream packages have new versions or capabilities
   not yet reflected in this plugin's skills.
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
-Check for upstream updates across the four MCP packages this plugin bundles,
-and surface any new MCP tools not yet covered by an existing skill.
+> Tool names here are the ones Claude Code gives this package's servers when it is installed as the `regen-network` plugin (`mcp__plugin_regen-network_<server>__<tool>`). Where the servers were added to a host directly, the prefix differs (e.g. `mcp__regen-koi__search`): match on server and tool name.
 
-## Step 1: Check published package versions
+Check the three upstream MCP packages this plugin pins against their latest
+published versions, and surface any MCP tools not yet covered by a skill. This
+skill reports; it does not edit `.mcp.json`. Bumping a pin is a deliberate
+release of this plugin (see "Updating a pin" below).
 
-Fetch the latest published version for each upstream package.
+## Step 1: Read the pinned versions
 
-**npm packages** — fetch from the npm registry:
+Read `.mcp.json` at the plugin root (`${CLAUDE_PLUGIN_ROOT:-.}/.mcp.json`). Each
+server's `args` carries its pin:
 
-```bash
-npm show regen-koi-mcp version 2>/dev/null && \
-npm show regen-compute version 2>/dev/null
-```
+| Server | Package | Registry |
+|--------|---------|----------|
+| `regen-koi` | `regen-koi-mcp@<version>` | npm |
+| `regen-ledger` | `regen-python-mcp==<version>` (plus `--with mcp<2`) | PyPI |
+| `regen-compute` | `regen-compute@<version>` | npm |
 
-If bash is not available, fetch these URLs instead:
-- `https://registry.npmjs.org/regen-koi-mcp/latest` → `.version`
-- `https://registry.npmjs.org/regen-compute/latest` → `.version`
-
-**PyPI packages** — fetch from the PyPI API:
-
-```bash
-pip index versions regen-python-mcp 2>/dev/null | head -1 && \
-pip index versions registry-review-mcp 2>/dev/null | head -1
-```
-
-If bash is not available, fetch these URLs instead:
-- `https://pypi.org/pypi/regen-python-mcp/json` → `.info.version`
-- `https://pypi.org/pypi/registry-review-mcp/json` → `.info.version`
-
-## Step 2: Check for new MCP tools not covered by skills
-
-The MCP servers may have gained new tools since this plugin's skills were last updated.
-Cross-reference what's available against what the skills actually use.
-
-**List tools currently used across all skills:**
+## Step 2: Check published versions
 
 ```bash
-grep -rh "mcp__regen" skills/ | grep -o 'mcp__[a-z_-]*__[a-z_]*' | sort -u
+npm view regen-koi-mcp version
+npm view regen-compute version
+curl -s https://pypi.org/pypi/regen-python-mcp/json | python3 -c 'import json,sys; print(json.load(sys.stdin)["info"]["version"])'
 ```
 
-**List tools available in the running MCP servers** (call these if the servers are connected):
+Without a shell, fetch `https://registry.npmjs.org/<package>/latest` (`.version`)
+and `https://pypi.org/pypi/regen-python-mcp/json` (`.info.version`).
 
-- `mcp__regen-koi__*` — check which tools are available in the connected regen-koi server
-- `mcp__regen-network__*` — check regen-network server tools
-- `mcp__regen-compute__*` — check regen-compute server tools
+For `regen-python-mcp`, also check whether its `requires_dist` now bounds `mcp`
+below 2, or whether it has moved to the `mcp` 2.x `MCPServer` API. Either one
+means the `--with mcp<2` workaround can be dropped.
 
-Compare the two lists. Any tool available in a connected server but not referenced in any skill file is a coverage gap — flag it as a candidate for a new skill or for adding to an existing one.
+## Step 3: Check for tools not covered by skills
 
-## Step 3: Check upstream release notes
+Tools the skills reference:
 
-For each package with a newer published version than what was last noted, fetch recent release notes:
+```bash
+grep -rho 'mcp__plugin_regen-network_[a-z-]*__[a-z_]*' skills/ | sort -u
+```
 
-- KOI MCP releases: `https://github.com/gaiaaiagent/regen-koi-mcp/releases`
-- Ledger MCP releases: `https://github.com/gaiaaiagent/regen-python-mcp/releases`
-- Compute releases: `https://github.com/regen-network/regen-compute/releases`
-- Registry Review releases: `https://github.com/gaiaaiagent/regen-registry-review-mcp/releases`
+Tools the connected servers expose: list the tools available under
+`mcp__plugin_regen-network_regen-koi__*`, `mcp__plugin_regen-network_regen-ledger__*`
+and `mcp__plugin_regen-network_regen-compute__*`. Any exposed tool that no skill
+references is a coverage gap. Flag it as a candidate for a new skill or an
+existing one; do not flag `retire_via_ecobridge` as a gap to fill casually,
+since it can move funds (see `regen-footprint`).
 
-Summarise any new tools, changed APIs, or deprecated endpoints that affect the skills here.
+## Step 4: Read release notes for newer versions
 
-## Step 4: Report
+- KOI MCP: `https://github.com/gaiaaiagent/regen-koi-mcp/releases`
+- Ledger MCP: `https://github.com/gaiaaiagent/regen-python-mcp/releases`
+- Compute: `https://github.com/regen-network/regen-compute/releases`
 
-Present a concise update report:
+Summarise new tools, changed parameters, and anything touching signing or
+payments in `regen-compute`.
+
+## Step 5: Report
 
 ```
 ## Regen Plugin Update Report
 
-### MCP Package Versions
-| Package | Latest | Status |
-|---------|--------|--------|
-| regen-koi-mcp (npm) | x.y.z | ✅ up to date / ⚠️ update available |
-| regen-compute (npm) | x.y.z | ... |
-| regen-python-mcp (PyPI) | x.y.z | ... |
-| registry-review-mcp (PyPI) | x.y.z | ... |
+### MCP package versions
+| Package | Pinned | Latest | Status |
+|---------|--------|--------|--------|
+| regen-koi-mcp (npm) | x.y.z | x.y.z | up to date / update available |
+| regen-compute (npm) | ... | ... | ... |
+| regen-python-mcp (PyPI) | ... | ... | ... (+ mcp<2 still needed?) |
 
-### New Tools Not Yet Covered by Skills
-[list any gaps, or "None found"]
+### Tools not yet covered by skills
+[list, or "None found"]
 
-### Notable Changes in New Versions
-[summarise release notes if updates are available, or "No updates"]
+### Notable changes in newer versions
+[summary, or "No updates"]
 
-### Recommended Actions
+### Recommended actions
 [specific next steps, or "No action needed"]
 ```
 
-If everything is up to date and no coverage gaps are found, say so clearly — this is a useful outcome too.
+Saying everything is up to date is a useful outcome too.
 
-## Notes
+## Updating a pin
 
-- The MCP servers in `.mcp.json` are configured with `@latest` (npm) and `--upgrade` (uvx), so they auto-update on each host restart. This skill is for surfacing *skill-level* gaps — new tools that the MCPs expose but no skill in this repo yet uses.
-- To update the skill files themselves, pull the latest version of this plugin repo and reinstall.
+1. Change the version in `.mcp.json` (and the matching snippets in `SETUP.md`).
+2. Start the server once and list its tools to confirm it initialises, e.g.
+   `npx -y regen-koi-mcp@<new>` or `uvx --with 'mcp<2' regen-python-mcp==<new>`
+   driven by an MCP client, or restart the host and check `/mcp`.
+3. Re-run Step 3 so skills match the new tool surface.
+4. Bump the plugin version in `.claude-plugin/plugin.json` and `marketplace.json`,
+   and log the change in `CHANGELOG.md`.
+
+`registry-review` is not checked: its server installs from a private GitHub
+repo and is not part of this package (see `regen-review`).

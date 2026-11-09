@@ -6,18 +6,20 @@ description: >
   "regen activity update", "regen network news", or wants a summary of
   recent activity across the Regen ecosystem.
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
 ---
+
+> Tool names here are the ones Claude Code gives this package's servers when it is installed as the `regen-network` plugin (`mcp__plugin_regen-network_<server>__<tool>`). Where the servers were added to a host directly, the prefix differs (e.g. `mcp__regen-koi__search`): match on server and tool name.
 
 Generate a digest of recent Regen Network activity using the KOI knowledge base.
 
 ## Workflow
 
-1. Call `mcp__regen-koi__generate_weekly_digest`. Accepts optional parameters:
+1. Call `mcp__plugin_regen-network_regen-koi__generate_weekly_digest`. Accepts optional parameters:
    - Date range for custom periods (defaults to last 7 days)
    - Format preferences
 
-2. Supplement with a `mcp__regen-koi__search` query sorted by `date_desc` to catch any recent high-activity topics the digest may have summarised too briefly.
+2. Supplement with a `mcp__plugin_regen-network_regen-koi__search` query sorted by `date_desc` to catch any recent high-activity topics the digest may have summarised too briefly.
 
 3. If the user asks about a specific area (governance, development, community), run a targeted search filtered by source:
    - Governance activity → `discourse` source

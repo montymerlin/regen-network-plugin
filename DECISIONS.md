@@ -79,3 +79,32 @@ Neither server has ever been reachable from this machine, so removing them costs
 **Alternatives Considered:**
 - *Leave the Claude-first framing in place* — rejected. It misdescribes what the package actually is
 - *Remove all host recommendations entirely* — rejected. Cowork still offers a materially better slash-command UX for some users
+
+---
+
+## Decision 005 — v0.3.0: own the package honestly, restore the ledger, pin everything (2026-11-09)
+
+**Context:** Monty wants to propose that the Regen team adopt this plugin's skills into their Claude marketplace and maintain them, [gaiaaiagent/regen-ai-claude](https://github.com/gaiaaiagent/regen-ai-claude) (maintained by Gaia AI; the `regen-network/regen-ai-claude` fork has never merged a PR). That marketplace lists three single-server MCP-only plugins: `koi`, `ledger`, `registry-review`. Before offering it, a review found the package misdescribed itself: the manifests named Regen Network as author and `regen-network/regen-ai-claude` as the repository; the docs promised four servers while `.mcp.json` declared two; skills called tool names (`mcp__regen-network__*` etc.) that do not exist inside a plugin, where Claude Code exposes `mcp__plugin_regen-network_<server>__*`; servers floated on `@latest`, which is how an unbounded `mcp` dependency broke the ledger server in the first place (Decision 004); and the README said nine skills where there are ten.
+
+On 2026-11-09 the ledger server was re-tested: `uvx regen-python-mcp==0.1.0` still crashes (`mcp` 2.x removed `mcp.server.fastmcp`), while `uvx --with 'mcp<2' regen-python-mcp==0.1.0` initialises (`regen-network-mcp-modular` 1.30.0), lists 45 tools including every tool the skills reference, and answers a live `list_credit_types` call. This is the fix proposed upstream in gaiaaiagent/regen-ai-claude#4 (Gregory Landua). `registry-review`'s upstream install source is `git+ssh://git@github.com/regen-network/registry-review-mcp.git`, which is private (404 from outside), and the PyPI name remains unpublished.
+
+**Decision:**
+1. **Ownership:** author, marketplace owner, homepage and repository point at Monty Bryant and `montymerlin/regen-network-plugin`. Upstream servers are credited in a README Credits section, with a line saying this is not an official Regen Network or Gaia AI release. Add an Apache-2.0 `LICENSE` (Monty chose Apache over MIT for continuity with the declared licence and with `regen-compute`).
+2. **Restore the ledger server** as `regen-ledger` with the `mcp<2` pin. The key is renamed from `regen-network` to avoid the stuttering tool prefix `mcp__plugin_regen-network_regen-network__*` and to name the layer it serves.
+3. **Pin all three servers** to the versions tested on 2026-11-09: `regen-koi-mcp@1.6.6`, `regen-python-mcp==0.1.0` with `mcp<2`, `regen-compute@0.3.4`. `regen-update` now reports pinned vs published and documents how to bump a pin.
+4. **Leave `registry-review` out** and say why in README, SETUP and the `regen-review` skill, which now explains the gap and points users with repo access to the upstream plugin.
+5. **Skills use plugin-namespaced tool names**, each with a one-line note for hosts that add servers directly.
+6. **Wallet safety:** `regen-footprint` defaults to the credit card link, confirms before any retirement call, and never suggests setting `REGEN_WALLET_MNEMONIC` / `ECOBRIDGE_EVM_MNEMONIC` or asks for a seed phrase; README replaces the env-var table with a Wallet keys section.
+
+**Consequences:**
+- The four ledger-backed skills (`regen-credits`, `regen-market`, `regen-governance`, `regen-portfolio`) work again
+- Upstream releases no longer reach users silently; each bump is a plugin release with a CHANGELOG entry, and staying current depends on running `/regen-update`
+- The `mcp<2` pin is a workaround with an exit: drop it once `regen-python-mcp` bounds `mcp` or moves to the 2.x `MCPServer` API
+- Installing `koi@regen-ai` or `ledger@regen-ai` beside this plugin starts the same servers twice; README and SETUP now say so
+- Users who added servers by hand under the old `regen-network` key keep working, but the skills' tool names no longer match theirs
+
+**Alternatives Considered:**
+- *Docs say two servers, ledger stays out* — rejected once the pinned server tested clean; four skills depend on it
+- *Keep `@latest`* — rejected: it is what broke the ledger server, and an upstream rename would silently break skills
+- *Pin `mcp` exactly (`mcp==1.30.0`)* — rejected for now; `mcp<2` matches upstream's PR and still takes 1.x patch releases
+- *Skills-only variant that relies on upstream `koi`/`ledger` plugins* — not built; kept as an option in ROADMAP. It removes the double-loading risk and leaves server ownership with Gaia AI, but depends on upstream merging the `mcp<2` fix and on a cross-plugin tool prefix (`mcp__plugin_koi_regen-koi__*`), and still needs `regen-compute` from somewhere

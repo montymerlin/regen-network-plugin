@@ -1,12 +1,22 @@
 {
   "name": "regen-network",
-  "version": "0.2.0",
-  "description": "Host-agnostic MCP + skills package for the Regen Network ecosystem: knowledge commons, blockchain ledger, ecological credit markets, and AI compute footprinting.",
+  "version": "0.3.0",
+  "description": "Regen Network knowledge commons, ledger, ecocredit markets and AI-footprint retirement as one MCP + skills package: three upstream MCP servers (KOI, Regen Ledger, Regen Compute) and ten skills.",
   "author": {
-    "name": "Regen Network"
+    "name": "Monty Bryant",
+    "url": "https://github.com/montymerlin"
   },
-  "homepage": "https://regen.network",
-  "repository": "https://github.com/regen-network/regen-ai-claude",
+  "homepage": "https://github.com/montymerlin/regen-network-plugin",
+  "repository": "https://github.com/montymerlin/regen-network-plugin",
   "license": "Apache-2.0",
-  "keywords": ["regen", "ecocredits", "carbon", "biodiversity", "blockchain", "knowledge-graph", "ecological", "regenerative"]
+  "keywords": [
+    "regen",
+    "ecocredits",
+    "carbon",
+    "biodiversity",
+    "blockchain",
+    "knowledge-graph",
+    "ecological",
+    "regenerative"
+  ]
 }

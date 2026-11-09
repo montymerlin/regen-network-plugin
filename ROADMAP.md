@@ -8,7 +8,11 @@ Where this plugin could go. Items here are aspirations, not commitments. When an
 
 ## Near-term
 
-- **Registry Review skill (v0.2.0)** — The MCP server is already bundled in `.mcp.json` but the `regen-review` skill is a placeholder. Needs: full SKILL.md with document review workflow, integration with `REGISTRY_REVIEW_ANTHROPIC_API_KEY` env var, and testing against real registry project documents. `status: idea`
+- **Hand the skills to upstream** — propose that the regen-ai marketplace become the one place for Regen's AI tools (KOI, ledger, Compute, Claims, Registry Review, skills), serving Claude Code and Codex from one repo with pinned servers and marketplace auto-update, and that Gaia AI build these skills natively into the [regen-ai marketplace](https://github.com/gaiaaiagent/regen-ai-claude) (KOI/ledger skills into their `koi` and `ledger` plugins, footprint into a `compute` plugin for `regen-compute`) and take over maintenance. Once they do, this repo points to theirs and is archived. Proposal and intro message drafted 2026-11-09; nothing sent. Supersedes listing this repo as a separate marketplace entry. `status: active`
+- **Drop the `mcp<2` pin** — once `regen-python-mcp` bounds `mcp` below 2 or moves to the 2.x `MCPServer` API (`/regen-update` checks). `status: idea`
+- **Skills-only variant** — ship the ten skills without servers and rely on upstream `koi@regen-ai` and `ledger@regen-ai`. Removes double-loading and leaves server ownership with Gaia AI; costs cross-plugin tool prefixes (`mcp__plugin_koi_regen-koi__*`), a hard dependency on upstream merging the `mcp<2` fix, and still needs `regen-compute` from somewhere. Worth deciding with the upstream maintainers if they take the marketplace entry. `status: idea`
+- **Registry Review skill** — implement `regen-review` properly if the Registry Review MCP becomes publicly installable (today it installs from the private `regen-network/registry-review-mcp`). `status: parked`
+- **Drop the `regen-` prefix from skill dirs** — would turn `regen-network:regen-search` into `regen-network:search` (flagged 2026-04-27). `status: idea`
 
 ## Future explorations
 
@@ -26,3 +30,4 @@ Where this plugin could go. Items here are aspirations, not commitments. When an
 - **Adopted agentic scaffold** — → Decision 001. `status: decided`
 - **Dual-distribution packaging** — → Decision 002. `status: decided`
 - **Reframe regen-network as a host-agnostic package** — → Decision 003. `status: decided`
+- **Own the package, restore the ledger, pin servers, leave registry-review out** — → Decision 005. `status: decided`

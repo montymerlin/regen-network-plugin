@@ -6,25 +6,27 @@ description: >
   methodologies", "marketplace activity", "credit pricing", or wants market
   intelligence on ecological credits.
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
 ---
+
+> Tool names here are the ones Claude Code gives this package's servers when it is installed as the `regen-network` plugin (`mcp__plugin_regen-network_<server>__<tool>`). Where the servers were added to a host directly, the prefix differs (e.g. `mcp__regen-koi__search`): match on server and tool name.
 
 Provide market analysis for Regen Network's ecological credit marketplace.
 
 ## Workflow
 
-1. **Current sell orders** — call `mcp__regen-network__list_sell_orders` for a full listing, or filter with:
-   - `mcp__regen-network__list_sell_orders_by_batch` for a specific credit batch
-   - `mcp__regen-network__list_sell_orders_by_seller` for a specific seller
-   - `mcp__regen-network__get_sell_order` for a single order by ID
+1. **Current sell orders** — call `mcp__plugin_regen-network_regen-ledger__list_sell_orders` for a full listing, or filter with:
+   - `mcp__plugin_regen-network_regen-ledger__list_sell_orders_by_batch` for a specific credit batch
+   - `mcp__plugin_regen-network_regen-ledger__list_sell_orders_by_seller` for a specific seller
+   - `mcp__plugin_regen-network_regen-ledger__get_sell_order` for a single order by ID
 
-2. **Allowed payment denominations** — call `mcp__regen-network__list_allowed_denoms` to show what currencies are accepted.
+2. **Allowed payment denominations** — call `mcp__plugin_regen-network_regen-ledger__list_allowed_denoms` to show what currencies are accepted.
 
-3. **Market trends** — call `mcp__regen-network__analyze_market_trends` for trend analysis across credit types and time periods.
+3. **Market trends** — call `mcp__plugin_regen-network_regen-ledger__analyze_market_trends` for trend analysis across credit types and time periods.
 
-4. **Methodology comparison** — if the user wants to compare credit approaches, call `mcp__regen-network__compare_credit_methodologies` with relevant class IDs (e.g. C01, C02, C03).
+4. **Methodology comparison** — if the user wants to compare credit approaches, call `mcp__plugin_regen-network_regen-ledger__compare_credit_methodologies` with relevant class IDs (e.g. C01, C02, C03).
 
-5. **Live marketplace browse** — call `mcp__regen-compute__browse_available_credits` for a user-friendly view of what's currently purchasable, with pricing.
+5. **Live marketplace browse** — call `mcp__plugin_regen-network_regen-compute__browse_available_credits` for a user-friendly view of what's currently purchasable, with pricing.
 
 ## Presenting results
 

@@ -4,6 +4,14 @@ A narrative record of how this plugin evolves. Updated after significant work se
 
 ---
 
+## 2026-11-09 — v0.3.0: ready to offer upstream
+
+Prepared the plugin to be proposed to the Regen team's marketplace, [gaiaaiagent/regen-ai-claude](https://github.com/gaiaaiagent/regen-ai-claude), with the aim that they build the skills in natively and take over maintenance. The package now says honestly whose it is: author, marketplace owner and repository point at Monty Bryant and `montymerlin/regen-network-plugin`, a README Credits section names Gaia AI and Regen Network as the server authors, and an Apache-2.0 `LICENSE` backs the licence the manifests already declared.
+
+The ledger server is back, as `regen-ledger`, run as `uvx --with 'mcp<2' regen-python-mcp==0.1.0` (the fix from gaiaaiagent/regen-ai-claude#4). Tested: it initialises, lists 45 tools covering every one the skills use, and answers live. All three servers are now pinned (`regen-koi-mcp@1.6.6`, `regen-compute@0.3.4`), each started and called once before pinning, and `regen-update` reports pinned vs published and explains how to bump.
+
+Skills now call tools by the names Claude Code actually exposes for plugin servers (`mcp__plugin_regen-network_<server>__*`); the old `mcp__regen-*__*` names never matched inside the plugin. `regen-footprint` defaults to the credit card link, confirms before any retirement call, and never suggests configuring a wallet mnemonic. `regen-review` now explains that the Registry Review server installs from a private repo and is not bundled. `regen-code` lost a duplicated section. README, SETUP and AGENTS say three servers and ten skills, add install lines, a Wallet keys section, a note on double-loading beside upstream `koi`/`ledger`, and correct the KOI size (about 38,000 documents, not 86,000+). See Decision 005.
+
 ## 2026-08-21 — Removed two unrunnable MCP servers
 
 Dropped `regen-network` (`uvx regen-python-mcp`) and `registry-review` (`uvx registry-review-mcp`) from `.mcp.json`. Both had been failing to start on every session, producing a persistent "Server disconnected" error toast. Verified upstream causes: `regen-python-mcp` crashes on import (`ModuleNotFoundError: No module named 'mcp.server.fastmcp'` — unpinned `mcp` dependency against a moved `FastMCP`), and `registry-review-mcp` is not published to PyPI. `regen-koi` and `regen-compute` remain and both connect cleanly.

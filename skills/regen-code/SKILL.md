@@ -6,29 +6,21 @@ description: >
   "find function in regen", "regen repo", "regen ledger code", or wants to
   understand the technical implementation of Regen Network software.
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
 ---
+
+> Tool names here are the ones Claude Code gives this package's servers when it is installed as the `regen-network` plugin (`mcp__plugin_regen-network_<server>__<tool>`). Where the servers were added to a host directly, the prefix differs (e.g. `mcp__regen-koi__search`): match on server and tool name.
 
 Explore the Regen Network codebase using the KOI code graph and GitHub document index.
 
 ## Tools
 
-### Code graph queries
-Call `mcp__regen-koi__query_code_graph` to explore relationships between Keepers, Messages, and Events in the Regen Ledger. Supported query types include:
-
-- `find_callers` — who calls a given function
-- `trace_call_chain` — follow the execution path from a function
-- `find_orphaned_code` — find code that's never called
-- General relationship queries between code entities
-
-Use this for architectural questions ("how does the ecocredit module work?", "what calls CreateBatch?").
-
 ### Repository overviews
-- `mcp__regen-koi__get_repo_overview` with `repository` parameter (e.g. `"regen-ledger"`, `"regen-web"`, `"regen-data-standards"`, `"regenie-corpus"`) — structured overview of a specific repo
-- `mcp__regen-koi__get_tech_stack` — technology stack information across all indexed repos
+- `mcp__plugin_regen-network_regen-koi__get_repo_overview` with `repository` parameter (e.g. `"regen-ledger"`, `"regen-web"`, `"regen-data-standards"`, `"regenie-corpus"`) — structured overview of a specific repo
+- `mcp__plugin_regen-network_regen-koi__get_tech_stack` — technology stack information across all indexed repos
 
 ### Code graph queries
-Call `mcp__regen-koi__query_code_graph` with `query_type` and `entity_name` (not `target`) for the entity you're asking about. Use `repo_name` (not `repository`) to filter by repo. Example query types:
+Call `mcp__plugin_regen-network_regen-koi__query_code_graph` with `query_type` and `entity_name` (not `target`) for the entity you're asking about. Use `repo_name` (not `repository`) to filter by repo. Example query types:
 - `find_callers` + `entity_name: "MsgCreateBatch"` — what calls this entity
 - `find_callees` + `entity_name: "SomeKeeper"` — what this entity calls
 - `trace_call_chain` + `from_entity` + `to_entity` — path between two entities
@@ -37,11 +29,13 @@ Call `mcp__regen-koi__query_code_graph` with `query_type` and `entity_name` (not
 - `list_modules` — all modules in the codebase
 - `keeper_for_msg` + `entity_name` — find the Keeper handling a Msg
 
+Use this for architectural questions ("how does the ecocredit module work?", "what calls MsgCreateBatch?").
+
 ### GitHub documentation search
-- `mcp__regen-koi__search_github_docs` — search across indexed repositories for code, documentation, and configuration files
+- `mcp__plugin_regen-network_regen-koi__search_github_docs` — search across indexed repositories for code, documentation, and configuration files
 
 ### SPARQL queries
-For advanced users, `mcp__regen-koi__sparql_query` executes raw SPARQL against the Apache Jena knowledge graph. Only use this if the user specifically asks for SPARQL or if the other tools don't return sufficient detail.
+For advanced users, `mcp__plugin_regen-network_regen-koi__sparql_query` executes raw SPARQL against the Apache Jena knowledge graph. Only use this if the user specifically asks for SPARQL or if the other tools don't return sufficient detail.
 
 ## Presenting results
 

@@ -2,15 +2,22 @@
   "mcpServers": {
     "regen-koi": {
       "command": "npx",
-      "args": ["-y", "regen-koi-mcp@latest"],
+      "args": ["-y", "regen-koi-mcp@1.6.6"],
       "env": {
         "KOI_API_ENDPOINT": "https://regen.gaiaai.xyz/api/koi",
         "JENA_ENDPOINT": "https://regen.gaiaai.xyz/api/koi/fuseki/koi/sparql"
       }
     },
+    "regen-ledger": {
+      "command": "uvx",
+      "args": ["--with", "mcp<2", "regen-python-mcp==0.1.0"],
+      "env": {
+        "REGEN_MCP_LOG_LEVEL": "INFO"
+      }
+    },
     "regen-compute": {
       "command": "npx",
-      "args": ["-y", "regen-compute@latest"]
+      "args": ["-y", "regen-compute@0.3.4"]
     }
   }
 }
